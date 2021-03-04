@@ -95,26 +95,25 @@ public class MainActivity extends AppCompatActivity {
         Log.i("zzz", "resutCode = "+ resultCode);
 
         if (resultCode == RESULT_OK && data != null){
-            Glide.with(this).load(data.getData()).fitCenter().into(imgContainer);
+//            Glide.with(this).load(data.getData()).fitCenter().into(imgContainer);
+            Uri selectedImage = data.getData();
 
-
-//            String[] filePathColumn = {MediaStore.Images.Media.DATA};
-//            if (selectedImage != null){
-//                Cursor cursor = getContentResolver().query(selectedImage,
-//                        filePathColumn, null, null, null);
-//                Log.i("zzz", "null");
-//                if (cursor!= null){
-//                    cursor.moveToFirst();
-//                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-//                    String picturePath = cursor.getString(columnIndex);
-//                    Log.i("zzz", picturePath);
-//                    Glide.with(this).load(picturePath).fitCenter().into(imgContainer);
-//                    cursor.close();
-//                }
-//            }
-//        }
-
+            String[] filePathColumn = {MediaStore.Images.Media.DATA};
+            if (selectedImage != null){
+                Cursor cursor = getContentResolver().query(selectedImage,
+                        filePathColumn, null, null, null);
+                Log.i("zzz", "null");
+                if (cursor!= null){
+                    cursor.moveToFirst();
+                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                    String picturePath = cursor.getString(columnIndex);
+                    Glide.with(this).load(picturePath).fitCenter().into(imgContainer);
+                    cursor.close();
+                }
+            }
         }
+
+
 
     }
 
