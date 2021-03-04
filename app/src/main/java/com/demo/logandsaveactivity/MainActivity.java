@@ -95,8 +95,8 @@ public class MainActivity extends AppCompatActivity {
         Log.i("zzz", "resutCode = "+ resultCode);
 
         if (resultCode == RESULT_OK && data != null){
-            Uri selectedImage = data.getData();
-            Glide.with(this).load(selectedImage).fitCenter().into(imgContainer);
+            Glide.with(this).load(data.getData()).fitCenter().into(imgContainer);
+
 
 //            String[] filePathColumn = {MediaStore.Images.Media.DATA};
 //            if (selectedImage != null){
