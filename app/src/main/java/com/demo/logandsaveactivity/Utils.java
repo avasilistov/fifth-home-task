@@ -1,7 +1,14 @@
 package com.demo.logandsaveactivity;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
 
+import androidx.core.content.FileProvider;
+
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -13,8 +20,9 @@ public class Utils {
     public static final String date_pattern = "yyyy-MM-dd_HH:mm:ss";
     public static final String file_name = "Log.txt";
 
+
     // Write down the state in the file Log.txt
-    public static void writeCall(String phase, Context context){
+    public static void writeCall(String phase, Context context) {
         SimpleDateFormat sdf = new SimpleDateFormat(date_pattern);
         String currentDateandTime = sdf.format(new Date());
         StringBuilder builder = new StringBuilder();
@@ -22,7 +30,7 @@ public class Utils {
         builder.append(" - ");
         builder.append(currentDateandTime);
         builder.append("\n");
-        try(FileOutputStream fos = context.openFileOutput(file_name, Context.MODE_APPEND)) {
+        try (FileOutputStream fos = context.openFileOutput(file_name, Context.MODE_APPEND)) {
 
             fos.write(builder.toString().getBytes());
         } catch (FileNotFoundException e) {
