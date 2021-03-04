@@ -79,11 +79,8 @@ public class MainActivity extends AppCompatActivity {
         cameraBtn.setOnClickListener(v -> dispatchTakePictureIntent());
 
         imageBtn.setOnClickListener(v -> {
-//            Intent pickPhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//            startActivityForResult(pickPhoto, 1);
-            Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-            photoPickerIntent.setType("image/*");
-            startActivityForResult(photoPickerIntent, 1);
+            Intent pickPhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            startActivityForResult(pickPhoto, 1);
                 });
 
 
