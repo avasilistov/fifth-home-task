@@ -1,22 +1,18 @@
 package com.demo.logandsaveactivity;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
+
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
-
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -29,13 +25,10 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
-
 import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-
 import org.jetbrains.annotations.NotNull;
-
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -58,19 +51,8 @@ public class MainActivity extends AppCompatActivity {
     private ImageView imgContainer;
     private String currentPhotoPath;
     private ConstraintLayout mLayout;
-    private ActivityResultLauncher<String> requestPermissionLauncher =
-            getActivityResultLauncher();
 
-    @NotNull
-    private ActivityResultLauncher<String> getActivityResultLauncher() {
-        return registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-            if (isGranted) {
 
-            } else {
-                accessDenyed();
-            }
-        });
-    }
 
     @NotNull
     private ActivityResultLauncher<Intent> imageActivityResultLauncher = registerForActivityResult(
@@ -83,53 +65,21 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-//    private void checkPermissions() {
-//        int count = 0;
-//        if (ContextCompat.checkSelfPermission(
-//                this, Manifest.permission.READ_EXTERNAL_STORAGE) ==
-//                PackageManager.PERMISSION_GRANTED) {
-//            count += 1;
-//
-//        } else if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-//                Manifest.permission.READ_EXTERNAL_STORAGE)) {
-//            Snackbar.make(mLayout, "I need permission", Snackbar.LENGTH_INDEFINITE)
-//                    .setAction(R.string.ok, view -> {
-//                        requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
-//                    }).show();
-//        } else {
-//            requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
-//        }
-//
-//        if (ContextCompat.checkSelfPermission(
-//                this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
-//                PackageManager.PERMISSION_GRANTED) {
-//
-//            count += 1;
-//
-//        } else if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-//                Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-//            Snackbar.make(mLayout, "I need permission", Snackbar.LENGTH_INDEFINITE)
-//                    .setAction(R.string.ok, view -> {
-//                        requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-//                    }).show();
-//        } else {
-//            requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-//        }
-//
-//        if (count>1) {
-//            Snackbar.make(mLayout, "All Permissions are granted", Snackbar.LENGTH_INDEFINITE)
-//                    .setAction(R.string.ok, view -> {
-//
-//                    }).show();
-//        }
-//
-//
-//    }
+    @NotNull
+    private ActivityResultLauncher<Intent> photoActivityResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    // There are no request codes
+                    Glide.with(this).load(currentPhotoPath).fitCenter().into(imgContainer);
+                }
+            });
+
+
 
     private void getAndShow(@Nullable Intent data) {
         String picturePath = "";
         if (data != null) {
-//            Glide.with(this).load(data.getData()).fitCenter().into(imgContainer);
             Uri selectedImage = data.getData();
             Log.i("zzz", "Uri selected image");
             String[] filePathColumn = {MediaStore.Images.Media.DATA};
@@ -190,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(Intent.createChooser(shareFileIntent, "Share"));
         });
 
-//        cameraBtn.setOnClickListener(v -> dispatchTakePictureIntent());
+        cameraBtn.setOnClickListener(v -> dispatchTakePictureIntent());
 
         imageBtn.setOnClickListener(v -> {
             Intent pickPhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -203,15 +153,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private String getFileName(Uri selectedImage, Context context) {
-        Cursor returnCursor =
-                context.getContentResolver().query(selectedImage, null, null, null, null);
-        int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-        returnCursor.moveToFirst();
-        String fileName = returnCursor.getString(nameIndex);
-        returnCursor.close();
-        return fileName;
-    }
+//    private String getFileName(Uri selectedImage, Context context) {
+//        Cursor returnCursor =
+//                context.getContentResolver().query(selectedImage, null, null, null, null);
+//        int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+//        returnCursor.moveToFirst();
+//        String fileName = returnCursor.getString(nameIndex);
+//        returnCursor.close();
+//        return fileName;
+//    }
 
 
     private void onAddButtonClicked() {
@@ -268,31 +218,30 @@ public class MainActivity extends AppCompatActivity {
         return image;
     }
 
-//    private void dispatchTakePictureIntent() {
-//        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-//            File photoFile = null;
-//            try {
-//                photoFile = createImageFile();
-//                Log.i("zzz", "file created");
-//            } catch (IOException ex) {
-//
-//            }
-//
-//            if (photoFile !=null){
-//                Uri photoURI = FileProvider.getUriForFile(this,
-//                        "com.demo.logandsaveactivity",
-//                        photoFile);
-//                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-//                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-//            }
-//        }
-//    }
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+                Log.i("zzz", "file created");
+            } catch (IOException ex) {
+
+            }
+
+            if (photoFile !=null){
+               Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.demo.logandsaveactivity.fileprovider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                photoActivityResultLauncher.launch(takePictureIntent);
+            }
+        }
+    }
 
 
     @Override
     protected void onStart() {
-//        checkPermissions();
         writeCall("onStart", this);
         super.onStart();
 
